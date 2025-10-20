@@ -8,7 +8,7 @@ sem efetivar POST.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from assets.sql import (
     sql_qt_edificacoes,
@@ -32,7 +32,9 @@ def _map_tipo_imovel(db_value: str | None) -> str:
     return "URBANO"
 
 
-def _coalesce_first_row_value(rows: List[tuple], idx: int = 0) -> Any:
+def _coalesce_first_row_value(
+    rows: Optional[List[tuple]], idx: int = 0
+) -> Any:
     if rows and len(rows[0]) > idx:
         return rows[0][idx]
     return None
@@ -116,7 +118,9 @@ def write_imovel_payload(cadastro: int | str, payload: Dict[str, Any]) -> Path:
     import json
 
     file_path = Path(__file__).resolve()
-    project_root = file_path.parents[4]
+    # Estrutura deste arquivo: <root>/src/utils/transformers/imovel_builder.py
+    # Portanto, parents[3] aponta para o diretório raiz do projeto (cornelio)
+    project_root = file_path.parents[3]
     out_dir = project_root / "data" / "json" / "post_imoveis"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_file = out_dir / f"{cadastro}.json"
