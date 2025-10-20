@@ -1,0 +1,84 @@
+DOCUMENTAÇÃO :
+
+https://arrecadacao.ajuda.betha.cloud/tributos/conteudostecnicos/migracao
+https://arrecadacao.ajuda.betha.cloud/tributos/conteudostecnicos/interacao/geoprocessamento
+
+Login Betha:
+suportetributech
+Sup0rt3G@
+
+*//////////////////////////////////////////////////////////////////////////////////////////////////*
+TOKENS:
+
+Authorization - Bearer a06a865d-9947-4499-ae42-1b491f6d82e0
+User-Access   - n-aMDi3ExRyDzNw3fQkIjjnPsr_6Mrlnmh1TDNxddt8=
+Content-Type  - application/json
+
+API - Informações Complementares.
+https://tributos.betha.cloud/service-layer-tributos/api/imoveisInfComplem
+
+Modelo JSON de alteração
+{
+"idIntegracao": "INTEGRACAO1",
+"imoveisInfComplem": {
+"idGerado": {
+"id": 2319303610
+},
+"idImoveis": 24705325,
+"idAgrupamentos": 298463,
+"idCamposAdicionais": 526824,
+"idCamposAdicionaisFilho": null,
+"ano": 2023,
+"areaTexto": "Texto",
+"dhCampo": "2024-01-01 00:00:00",
+"texto": "Teste Rafael",
+"vlCampo": 10
+}
+}
+
+*//////////////////////////////////////////////////////////////////////////////////////////////////*
+
+OBS: Após o envio é gerado um numero de lote de processamento.
+consultar o LOTE para verificar se foi enviado com sucesso.
+
+API - Consulta do retorno do LOTE
+https://tributos.betha.cloud/service-layer-tributos/api/lotes/{Numero do LOTE}
+
+*//////////////////////////////////////////////////////////////////////////////////////////////////*
+TOKENS
+
+Authorization - Bearer 64aa6c8c-878c-4c28-ab78-dee070bacfce
+User-Access - n-aMDi3ExRyDzNw3fQkIjjnPsr_6Mrlnmh1TDNxddt8=
+Content-Type - application/json
+
+API - Consulta das informações complementares
+https://tributos.suite.betha.cloud/dados/v1/imoveis/24705325/campos-adicionais
+
+n-aMDi3ExRyDzNw3fQkIjjnPsr_6Mrlnmh1TDNxddt8=
+Content-Type - application/json
+
+*//////////////////////////////////////////////////////////////////////////////////////////////////*
+
+Cadastros de TESTE:
+
+29264
+29263
+29262
+29261
+29260
+29259
+29258
+29257
+29256
+29255
+29254
+
+/*=============================================*/
+
+# IMOVEL // LOTE
+
+https://tributos.suite.betha.cloud/dados/v1/imoveis?filter=codigo=1000
+
+- Tipo Imovel
+
+/*=============================================*/

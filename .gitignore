@@ -1,0 +1,110 @@
+# ========= SISTEMA / OS =========
+.DS_Store
+Thumbs.db
+
+# ========= PYTHON =========
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+.ptyhon-version
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+.cache/
+.pyre/
+.tox/
+.nox/
+.ipynb_checkpoints/
+.jupyter/lab/workspaces/
+
+# ========= BUILD / DIST =========
+build/
+dist/
+wheels/
+htmlcov/
+coverage.xml
+
+# ========= CONFIG / SECRETS =========
+.env
+.env.*
+*.env
+*.secret
+*.secrets
+*.key
+*.pem
+
+# ========= LOGS / TEMP =========
+*.log
+logs/
+nohup.out
+tmp/
+temp/
+*.tmp
+
+# ========= DOCKER / DEVCONTAINER =========
+docker-compose.override.yml
+.devcontainer/
+*.local.yml
+
+# ========= IDE / EDITOR =========
+.idea/
+.vscode/
+*.code-workspace
+.history/
+.fleet/
+
+# ========= FRONT-END (se existir) =========
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.angular/cache/
+.vite/
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+.parcel-cache/
+.vscode/.tsbuildinfo
+dist/
+out/
+coverage/
+
+# ========= N8N =========
+.n8n/
+
+# ========= DADOS / BACKUP (pedido) =========
+data/*
+!data/.gitkeep
+backup/*
+!backup/.gitkeep
+
+# ========= DB DUMPS =========
+*.sql
+*.dump
+*.backup
+*.bak
+
+# ========= ARQUIVOS GRANDES COMUNS =========
+*.zip
+*.tar
+*.tar.gz
+*.7z
