@@ -2,6 +2,10 @@ from utils.api import *
 from utils.api.pessoa import *
 from utils.processamento import *
 from cli.console import * 
+from utils.transformers.imovel_builder import (
+    build_imovel_payload,
+    write_imovel_payload,
+)
 import os
 import sys
 from colorama import Fore, Style
@@ -44,7 +48,17 @@ def main():
             input("\nPressione Enter para continuar...")
             
         elif opcao == "4":
-            
+            cadastro = str(input(f"|{Fore.LIGHTCYAN_EX} Informe o cadastro: {Fore.GREEN}"))
+            try:
+                payload = build_imovel_payload(cadastro)
+                out_file = write_imovel_payload(cadastro, payload)
+                print(
+                    f"\n{Fore.GREEN}JSON gerado para devolução:{Style.RESET_ALL} "
+                    f"{Fore.CYAN}{out_file}{Style.RESET_ALL}"
+                )
+            except Exception as e:
+                print(f"Erro ao gerar JSON do cadastro {cadastro}. Detalhes: {e}")
+
             input("\nPressione Enter para continuar...") 
         
         elif opcao == "5":

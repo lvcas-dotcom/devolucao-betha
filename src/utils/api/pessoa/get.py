@@ -1,8 +1,8 @@
 from colorama import Style
-from cli.console import exibir_menu_pessoa
 import requests
 import json
 from pathlib import Path
+
 
 def get_pessoa(cadastro):
     "Obtem cadastro completo da base BETHA."
@@ -33,7 +33,7 @@ def get_pessoa(cadastro):
         # requisição GET
         response = requests.get(url, headers=headers, timeout=30)
 
-            # Verificando se a solicitação foi bem-sucedida
+        # Verificando se a solicitação foi bem-sucedida
         if response.status_code == 200:
             json_data = response.json()
 
@@ -102,13 +102,8 @@ def get_all_pessoa():
                 )
                 break
 
-            # Feedback visual durante a execução
-            exibir_menu_pessoa()
-            print(
-                f"{Style.RESET_ALL}|" +
-                "=" * 73 +
-                "|"
-            )
+            # Feedback visual durante a execução (sem importar CLI)
+            print(f"{Style.RESET_ALL}|" + "=" * 73 + "|")
             print(
                 "\nGERANDO ARQUIVO get_all_pessoas.json...  "
                 "CADASTROS BAIXADOS: "

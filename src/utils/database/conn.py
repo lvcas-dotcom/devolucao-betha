@@ -13,7 +13,7 @@ def _load_config_from_env():
         "port": int(os.getenv("DB_PORT", "5432")),
         "database": os.getenv("DB_NAME", "geon_pr_cornelio"),
         "user": os.getenv("DB_USER", "postgres"),
-        "password": os.getenv("DB_PASSWORD", os.getenv("DB_PASS", "qgis")),
+        "password": os.getenv("DB_PASSWORD", os.getenv("DB_PASS", "postgres")),
     }
 
 

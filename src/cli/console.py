@@ -139,6 +139,7 @@ def exibir_menu():
     print(f"|{Fore.LIGHTGREEN_EX} [ 1 ] {Style.RESET_ALL}Baixar um {Fore.GREEN}IMOVEL{Style.RESET_ALL}                                                  |")
     print(f"|{Fore.LIGHTGREEN_EX} [ 2 ] {Style.RESET_ALL}Baixar um {Fore.GREEN}IMOVEL com informações adicionais{Style.RESET_ALL}                       |")
     print(f"|{Fore.LIGHTGREEN_EX} [ 3 ] {Style.RESET_ALL}Atualizar{Fore.YELLOW} base BETHA {Style.RESET_ALL}com informações da{Fore.LIGHTBLUE_EX} base GEON{Style.RESET_ALL}                 |")
+    print(f"|{Fore.LIGHTGREEN_EX} [ 4 ] {Style.RESET_ALL}Gerar {Fore.GREEN}JSON de IMÓVEL{Style.RESET_ALL} para devolução (Betha){Style.RESET_ALL}             |")
     print(f"|{Fore.LIGHTGREEN_EX} [ 5 ] {Style.RESET_ALL}Cadastro de {Fore.GREEN}PESSOAS{Style.RESET_ALL}                                               |")
     print(f"|                                                                         |")
     print(f"|{Fore.LIGHTMAGENTA_EX} [ 9 ] Créditos                                                   {Style.RESET_ALL}       |")
