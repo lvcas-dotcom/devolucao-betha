@@ -77,12 +77,11 @@ def _extrair_bic_generica(
         return None
 
 
-def extrair_bics_edificacao(
-    cadastro: int,
-    sequencia: int
+def extrair_todas_bics_edificacao(
+    cadastro: int, sequencia: int
 ) -> Dict[str, Any]:
     """
-    Extrai todas as BICs de uma edificação.
+    Extrai TODAS as BICs disponíveis de uma edificação (query genérica).
 
     Args:
         cadastro: Número do cadastro
@@ -91,7 +90,6 @@ def extrair_bics_edificacao(
     Returns:
         Dicionário com todas as BICs da edificação
     """
-    # Usar query genérica para buscar todas as BICs disponíveis
     query = f"""
     SELECT DISTINCT
         modelocampo.idkey AS campo_id,
@@ -183,6 +181,60 @@ def extrair_bics_edificacao(
     except Exception as e:
         print(f"Erro ao extrair BICs da edificação: {e}")
         return {}
+
+
+def extrair_bics_edificacao(
+    cadastro: int, sequencia: int
+) -> Dict[str, Any]:
+    """
+    Extrai apenas as BICs solicitadas de uma edificação:
+    - TIPO
+    - ALINHAMENTO
+    - LOCALIZACAO
+    - POSICAO
+    - ESTRUTURA
+    - COBERTURA
+    - VEDACAO
+    - FORRO
+    - REVEST EXTERNO
+    - SANITARIOS
+    - ACABAM. INTERNO
+    - PISO
+    - CONSERVACAO
+
+    Args:
+        cadastro: Número do cadastro
+        sequencia: Sequência da edificação
+
+    Returns:
+        Dicionário com as BICs solicitadas da edificação
+    """
+    # Buscar todas as BICs
+    todas_bics = extrair_todas_bics_edificacao(cadastro, sequencia)
+    
+    # Filtrar apenas os campos solicitados
+    campos_solicitados = [
+        'tipo',
+        'alinhamento',
+        'localizacao',
+        'posicao',
+        'estrutura',
+        'cobertura',
+        'vedacao',
+        'forro',
+        'revest_externo',
+        'sanitarios',
+        'acabam_interno',
+        'piso',
+        'conservacao'
+    ]
+    
+    bics_filtradas = {}
+    for chave in campos_solicitados:
+        if chave in todas_bics:
+            bics_filtradas[chave] = todas_bics[chave]
+    
+    return bics_filtradas
 
 
 def extrair_todas_bics_lote(cadastro: int) -> Dict[str, Any]:
@@ -289,16 +341,39 @@ def extrair_todas_bics_lote(cadastro: int) -> Dict[str, Any]:
 
 def extrair_bics_lote(cadastro: int) -> Dict[str, Any]:
     """
-    Extrai todas as BICs de um lote.
+    Extrai apenas as BICs solicitadas de um lote:
+    - MEIO FIO
+    - PAVIMENTACAO
+    - OCUPACAO
+    - UTILIZACAO
+    - SITUACAO
+    - CERCA/MURO
 
     Args:
         cadastro: Número do cadastro
 
     Returns:
-        Dicionário com todas as BICs do lote
+        Dicionário com as BICs solicitadas do lote
     """
-    # Usar a query genérica que busca todas as BICs
-    return extrair_todas_bics_lote(cadastro)
+    # Buscar todas as BICs
+    todas_bics = extrair_todas_bics_lote(cadastro)
+    
+    # Filtrar apenas os campos solicitados
+    campos_solicitados = {
+        'meio_fio': 'Meio Fio',
+        'pavimentacao': 'Pavimentacao',
+        'ocupacao': 'Ocupacao',
+        'utilizacao': 'Utilizacao',
+        'situacao': 'Situacao',
+        'cercamuro': 'Cerca/Muro'
+    }
+    
+    bics_filtradas = {}
+    for chave in campos_solicitados:
+        if chave in todas_bics:
+            bics_filtradas[chave] = todas_bics[chave]
+    
+    return bics_filtradas
 
 
 def formatar_bics_para_api(bics: Dict[str, Any]) -> List[Dict[str, Any]]:
