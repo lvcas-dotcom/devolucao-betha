@@ -80,7 +80,7 @@ def _build_dados_basicos(cadastro: int) -> Dict[str, Any]:
         Dicionário com dados básicos do imóvel
     """
     row = _get_first_row(
-        exec_select(SQL_DADOS_BASICOS_IMOVEL.format(cadastro=cadastro))
+        exec_select(SQL_DADOS_BASICOS_IMOVEL.format(cadastro=cadastro), silent=True)
     )
 
     if not row:
