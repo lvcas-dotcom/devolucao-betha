@@ -12,11 +12,13 @@ def get_imovel_campos_adicinais(cadastro):
 
     if not id_imovel:
         # Tenta baixar o imóvel e extrair novamente
+        print(f"\n⚠️  Arquivo local não encontrado. Buscando cadastro {cadastro} na API Betha...")
         get_imovel(cadastro)
         id_imovel = extract_id_imovel(cadastro)
         if not id_imovel:
             print(
-                "Não foi possível determinar o ID do imóvel após baixar o cadastro."
+                f"\n❌ Cadastro {cadastro} NÃO existe na base Betha."
+                f"\n   O imóvel precisa ser enviado primeiro usando a opção 4 (Gerar JSON)."
             )
             return None
 

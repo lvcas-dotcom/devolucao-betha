@@ -68,9 +68,7 @@ def extract_id_imovel(cadastro):
             id_imovel = dados['content'][0]['id']
             return str(id_imovel)
         else:
-            print(
-                f"Lista 'content' vazia ou inexistente no arquivo {json_path}."
-            )
+            # Content vazio significa que o imóvel não existe na Betha
             return None
 
     except FileNotFoundError:
