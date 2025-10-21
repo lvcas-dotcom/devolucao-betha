@@ -326,6 +326,8 @@ def _build_campos_adicionais(cadastro: int) -> List[Dict[str, Any]]:
     Returns:
         Lista de campos adicionais
     """
+    from utils.transformers.bic_extractor import extrair_bics_edificacao
+
     campos_adicionais = []
 
     # 1. Adicionar áreas (lote e edificações)
@@ -338,10 +340,48 @@ def _build_campos_adicionais(cadastro: int) -> List[Dict[str, Any]]:
     # 2. Adicionar BICs do lote
     try:
         bics_lote = extrair_bics_lote(cadastro)
-        bics_formatadas = formatar_bics_para_api(bics_lote)
-        campos_adicionais.extend(bics_formatadas)
+        if bics_lote:
+            bics_formatadas = formatar_bics_para_api(bics_lote)
+            campos_adicionais.extend(bics_formatadas)
     except Exception as e:
         print(f"Aviso: Erro ao extrair BICs do lote {cadastro}: {e}")
+
+    # 3. Adicionar BICs das edificações
+    try:
+        # Buscar todas as sequências de edificações (sem filtro de conferência)
+        query_edificacoes = f"""
+        SELECT sequencia
+        FROM imobiliario.edificacao
+        WHERE cadastro = {cadastro}
+          AND demolido IS NOT TRUE
+        ORDER BY sequencia
+        """
+        seq_rows = exec_select(query_edificacoes)
+
+        if seq_rows:
+            for seq_row in seq_rows:
+                if not seq_row or len(seq_row) < 1:
+                    continue
+
+                sequencia = seq_row[0]
+
+                # Extrair BICs da edificação
+                bics_edif = extrair_bics_edificacao(cadastro, sequencia)
+
+                if bics_edif:
+                    # Adicionar prefixo para identificar a edificação
+                    bics_edif_com_prefixo = {}
+                    for chave, valor in bics_edif.items():
+                        nova_chave = f"edif_seq{sequencia}_{chave}"
+                        bics_edif_com_prefixo[nova_chave] = valor
+
+                    bics_formatadas = formatar_bics_para_api(
+                        bics_edif_com_prefixo
+                    )
+                    campos_adicionais.extend(bics_formatadas)
+
+    except Exception as e:
+        print(f"Aviso: Erro ao extrair BICs das edificações {cadastro}: {e}")
 
     return campos_adicionais
 

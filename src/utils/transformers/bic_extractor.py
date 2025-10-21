@@ -4,25 +4,7 @@ Utiliza as queries SQL já definidas no projeto.
 """
 from typing import Any, Dict, List, Optional
 
-from assets.sql import (
-    sql_bic_alinhamento,
-    sql_bic_cobertura,
-    sql_bic_conservacao,
-    sql_bic_estrutura,
-    sql_bic_forro,
-    sql_bic_insteletrica,
-    sql_bic_localizacao,
-    sql_bic_ocupacao_lote,
-    sql_bic_piso,
-    sql_bic_posicao,
-    sql_bic_revestimentoext,
-    sql_bic_sanitarios,
-    sql_bic_situacao_lote,
-    sql_bic_tipoimovel,
-    sql_bic_utilizacao_edif,
-    sql_bic_utilizacao_lote,
-    sql_bic_vedacao,
-)
+# Imports não mais necessários - usando queries genéricas
 from utils.database.conn import exec_select
 
 
@@ -109,97 +91,200 @@ def extrair_bics_edificacao(
     Returns:
         Dicionário com todas as BICs da edificação
     """
-    bics = {}
+    # Usar query genérica para buscar todas as BICs disponíveis
+    query = f"""
+    SELECT DISTINCT
+        modelocampo.idkey AS campo_id,
+        modelocampo.campo AS campo_codigo,
+        modelocampo.descricao AS campo_descricao,
+        modelocamporesposta.idkey AS resposta_id,
+        modelocamporesposta.modeloresposta AS resposta_codigo,
+        modelocamporesposta.descricao AS resposta_desc,
+        CASE
+            WHEN t.idkey = 1 THEN 'P'
+            WHEN t.idkey = 2 THEN 'N'
+            WHEN t.idkey = 3 THEN 'T'
+            ELSE 'T'
+        END AS campo_tipo,
+        modelogrupo.descricao AS grupo_descricao
+    FROM
+        imobiliario.edificacao edif
+    LEFT JOIN
+        imobiliario.edificacaobic tpl_bic
+        ON tpl_bic.idkey_edificacao = edif.idkey
+    LEFT JOIN
+        geral.biccamporespostas camporesposta
+        ON tpl_bic.idkey_biccamporespostas = camporesposta.idkey
+    JOIN
+        geral.bicrespostaperiodos periodo
+        ON camporesposta.idkey_bicrespostaperiodo = periodo.idkey
+        AND periodo.fim_periodo IS NULL
+    LEFT JOIN
+        geral.tpl_biccamporespostas_bicmodelocamporesposta tpl
+        ON tpl.idkey_biccamporespostas = camporesposta.idkey
+    LEFT JOIN
+        geral.bicmodelocamporesposta modelocamporesposta
+        ON tpl.idkey_bicmodelocamporesposta = modelocamporesposta.idkey
+    LEFT JOIN
+        geral.bicmodelocampo modelocampo
+        ON modelocamporesposta.idkey_bicmodelocampo = modelocampo.idkey
+    LEFT JOIN
+        geral.tipocampo t
+        ON t.idkey = modelocampo.tipocampo_idkey
+    LEFT JOIN
+        geral.bicmodelogrupo modelogrupo
+        ON modelocampo.idkey_bicmodelogrupo = modelogrupo.idkey
+    WHERE
+        edif.cadastro = {cadastro}
+        AND edif.sequencia = {sequencia}
+        AND modelocampo.idkey IS NOT NULL
+        AND modelocamporesposta.descricao IS NOT NULL
+    ORDER BY
+        campo_id
+    """
 
-    # TIPO
-    bic_tipo = _extrair_bic_generica(sql_bic_tipoimovel, cadastro, sequencia)
-    if bic_tipo:
-        bics["tipo"] = bic_tipo
+    try:
+        rows = exec_select(query)
+        if not rows:
+            return {}
 
-    # ALINHAMENTO
-    bic_alinhamento = _extrair_bic_generica(
-        sql_bic_alinhamento, cadastro, sequencia
-    )
-    if bic_alinhamento:
-        bics["alinhamento"] = bic_alinhamento
+        bics = {}
 
-    # LOCALIZAÇÃO
-    bic_localizacao = _extrair_bic_generica(
-        sql_bic_localizacao, cadastro, sequencia
-    )
-    if bic_localizacao:
-        bics["localizacao"] = bic_localizacao
+        for row in rows:
+            campo_descricao = row[2] if len(row) > 2 else None
+            resposta_desc = row[5] if len(row) > 5 else None
 
-    # POSIÇÃO
-    bic_posicao = _extrair_bic_generica(sql_bic_posicao, cadastro, sequencia)
-    if bic_posicao:
-        bics["posicao"] = bic_posicao
+            if not campo_descricao:
+                continue
 
-    # ESTRUTURA
-    bic_estrutura = _extrair_bic_generica(
-        sql_bic_estrutura, cadastro, sequencia
-    )
-    if bic_estrutura:
-        bics["estrutura"] = bic_estrutura
+            # Criar chave limpa (sem espaços e caracteres especiais)
+            chave = campo_descricao.lower().replace(" ", "_").replace(".", "")
+            chave = ''.join(c for c in chave if c.isalnum() or c == '_')
 
-    # COBERTURA
-    bic_cobertura = _extrair_bic_generica(
-        sql_bic_cobertura, cadastro, sequencia
-    )
-    if bic_cobertura:
-        bics["cobertura"] = bic_cobertura
+            bics[chave] = {
+                "campo": {
+                    "id": row[0] if len(row) > 0 else None,
+                    "codigo": row[1] if len(row) > 1 else None,
+                    "descricao": campo_descricao,
+                    "tipo": row[6] if len(row) > 6 else "T",
+                },
+                "resposta": {
+                    "id": row[3] if len(row) > 3 else None,
+                    "codigo": row[4] if len(row) > 4 else None,
+                    "descricao": resposta_desc,
+                },
+                "grupo": {
+                    "descricao": row[7] if len(row) > 7 else None,
+                }
+            }
 
-    # VEDAÇÃO
-    bic_vedacao = _extrair_bic_generica(sql_bic_vedacao, cadastro, sequencia)
-    if bic_vedacao:
-        bics["vedacao"] = bic_vedacao
+        return bics
 
-    # FORRO
-    bic_forro = _extrair_bic_generica(sql_bic_forro, cadastro, sequencia)
-    if bic_forro:
-        bics["forro"] = bic_forro
+    except Exception as e:
+        print(f"Erro ao extrair BICs da edificação: {e}")
+        return {}
 
-    # REVESTIMENTO EXTERNO
-    bic_revest = _extrair_bic_generica(
-        sql_bic_revestimentoext, cadastro, sequencia
-    )
-    if bic_revest:
-        bics["revestimentoExterno"] = bic_revest
 
-    # SANITÁRIOS
-    bic_sanitarios = _extrair_bic_generica(
-        sql_bic_sanitarios, cadastro, sequencia
-    )
-    if bic_sanitarios:
-        bics["sanitarios"] = bic_sanitarios
+def extrair_todas_bics_lote(cadastro: int) -> Dict[str, Any]:
+    """
+    Extrai TODAS as BICs disponíveis de um lote (query genérica).
 
-    # INSTALAÇÃO ELÉTRICA (ACABAMENTO INTERNO)
-    bic_inst_eletrica = _extrair_bic_generica(
-        sql_bic_insteletrica, cadastro, sequencia
-    )
-    if bic_inst_eletrica:
-        bics["instalacaoEletrica"] = bic_inst_eletrica
+    Args:
+        cadastro: Número do cadastro
 
-    # PISO
-    bic_piso = _extrair_bic_generica(sql_bic_piso, cadastro, sequencia)
-    if bic_piso:
-        bics["piso"] = bic_piso
+    Returns:
+        Dicionário com todas as BICs do lote
+    """
+    query = f"""
+    SELECT DISTINCT
+        modelocampo.idkey AS campo_id,
+        modelocampo.campo AS campo_codigo,
+        modelocampo.descricao AS campo_descricao,
+        modelocamporesposta.idkey AS resposta_id,
+        modelocamporesposta.modeloresposta AS resposta_codigo,
+        modelocamporesposta.descricao AS resposta_desc,
+        CASE
+            WHEN t.idkey = 1 THEN 'P'
+            WHEN t.idkey = 2 THEN 'N'
+            WHEN t.idkey = 3 THEN 'T'
+            ELSE 'T'
+        END AS campo_tipo,
+        modelogrupo.descricao AS grupo_descricao
+    FROM
+        imobiliario.lote lote
+    LEFT JOIN
+        imobiliario.lotebic tpl_bic
+        ON tpl_bic.idkey_lote = lote.idkey
+    LEFT JOIN
+        geral.biccamporespostas camporesposta
+        ON tpl_bic.idkey_biccamporespostas = camporesposta.idkey
+    JOIN
+        geral.bicrespostaperiodos periodo
+        ON camporesposta.idkey_bicrespostaperiodo = periodo.idkey
+        AND periodo.fim_periodo IS NULL
+    LEFT JOIN
+        geral.tpl_biccamporespostas_bicmodelocamporesposta tpl
+        ON tpl.idkey_biccamporespostas = camporesposta.idkey
+    LEFT JOIN
+        geral.bicmodelocamporesposta modelocamporesposta
+        ON tpl.idkey_bicmodelocamporesposta = modelocamporesposta.idkey
+    LEFT JOIN
+        geral.bicmodelocampo modelocampo
+        ON modelocamporesposta.idkey_bicmodelocampo = modelocampo.idkey
+    LEFT JOIN
+        geral.tipocampo t
+        ON t.idkey = modelocampo.tipocampo_idkey
+    LEFT JOIN
+        geral.bicmodelogrupo modelogrupo
+        ON modelocampo.idkey_bicmodelogrupo = modelogrupo.idkey
+    WHERE
+        lote.cadastro = {cadastro}
+        AND modelocampo.idkey IS NOT NULL
+        AND modelocamporesposta.descricao IS NOT NULL
+    ORDER BY
+        campo_id
+    """
 
-    # CONSERVAÇÃO
-    bic_conservacao = _extrair_bic_generica(
-        sql_bic_conservacao, cadastro, sequencia
-    )
-    if bic_conservacao:
-        bics["conservacao"] = bic_conservacao
+    try:
+        rows = exec_select(query)
+        if not rows:
+            return {}
 
-    # UTILIZAÇÃO
-    bic_utilizacao = _extrair_bic_generica(
-        sql_bic_utilizacao_edif, cadastro, sequencia
-    )
-    if bic_utilizacao:
-        bics["utilizacao"] = bic_utilizacao
+        bics = {}
 
-    return bics
+        for row in rows:
+            campo_descricao = row[2] if len(row) > 2 else None
+            resposta_desc = row[5] if len(row) > 5 else None
+
+            if not campo_descricao:
+                continue
+
+            # Criar chave limpa (sem espaços e caracteres especiais)
+            chave = campo_descricao.lower().replace(" ", "_").replace(".", "")
+            chave = ''.join(c for c in chave if c.isalnum() or c == '_')
+
+            bics[chave] = {
+                "campo": {
+                    "id": row[0] if len(row) > 0 else None,
+                    "codigo": row[1] if len(row) > 1 else None,
+                    "descricao": campo_descricao,
+                    "tipo": row[6] if len(row) > 6 else "T",
+                },
+                "resposta": {
+                    "id": row[3] if len(row) > 3 else None,
+                    "codigo": row[4] if len(row) > 4 else None,
+                    "descricao": resposta_desc,
+                },
+                "grupo": {
+                    "descricao": row[7] if len(row) > 7 else None,
+                }
+            }
+
+        return bics
+
+    except Exception as e:
+        print(f"Erro ao extrair BICs do lote: {e}")
+        return {}
 
 
 def extrair_bics_lote(cadastro: int) -> Dict[str, Any]:
@@ -212,26 +297,8 @@ def extrair_bics_lote(cadastro: int) -> Dict[str, Any]:
     Returns:
         Dicionário com todas as BICs do lote
     """
-    bics = {}
-
-    # OCUPAÇÃO
-    bic_ocupacao = _extrair_bic_generica(sql_bic_ocupacao_lote, cadastro)
-    if bic_ocupacao:
-        bics["ocupacao"] = bic_ocupacao
-
-    # UTILIZAÇÃO
-    bic_utilizacao = _extrair_bic_generica(
-        sql_bic_utilizacao_lote, cadastro
-    )
-    if bic_utilizacao:
-        bics["utilizacao"] = bic_utilizacao
-
-    # SITUAÇÃO
-    bic_situacao = _extrair_bic_generica(sql_bic_situacao_lote, cadastro)
-    if bic_situacao:
-        bics["situacao"] = bic_situacao
-
-    return bics
+    # Usar a query genérica que busca todas as BICs
+    return extrair_todas_bics_lote(cadastro)
 
 
 def formatar_bics_para_api(bics: Dict[str, Any]) -> List[Dict[str, Any]]:
