@@ -159,14 +159,19 @@ WHERE
 
 SQL_TESTADAS = """
 SELECT
-    lt.valor AS valor_testada,
-    lt.medida AS medida_testada,
-    NULL AS face_descricao,
+    lt.tamanhotestada AS valor_testada,
+    'M' AS medida_testada,
+    log.descricao AS face_descricao,
     NULL AS face_abreviatura
 FROM
     imobiliario.lotetestada lt
+JOIN
+    imobiliario.lote l ON l.idkey = lt.idkey_lote
+LEFT JOIN
+    geral.logradouro log ON log.id = lt.idkey_logradourotestada
 WHERE
-    lt.cadastro = {cadastro}
+    l.cadastro = {cadastro}
+    AND lt.tamanhotestada IS NOT NULL
 ORDER BY
     lt.idkey
 """

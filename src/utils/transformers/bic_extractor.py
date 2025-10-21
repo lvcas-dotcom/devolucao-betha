@@ -2,79 +2,9 @@
 Extrator de BICs (Boletim de Informações Cadastrais) para edificações e lotes.
 Utiliza as queries SQL já definidas no projeto.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-# Imports não mais necessários - usando queries genéricas
 from utils.database.conn import exec_select
-
-
-def _extrair_bic_generica(
-    sql_query: str,
-    cadastro: int,
-    sequencia: Optional[int] = None
-) -> Optional[Dict[str, Any]]:
-    """
-    Extrai uma BIC genérica e retorna no formato estruturado.
-
-    Args:
-        sql_query: Query SQL para buscar a BIC
-        cadastro: Número do cadastro
-        sequencia: Sequência da edificação (opcional, para BICs de edificação)
-
-    Returns:
-        Dicionário com informações da BIC ou None
-    """
-    if sequencia is not None:
-        query = sql_query.format(cadastro=cadastro, sequencia=sequencia)
-    else:
-        query = sql_query + str(cadastro)
-
-    try:
-        rows = exec_select(query, silent=True)
-        if not rows or len(rows) == 0:
-            return None
-
-        # Primeira linha com os dados
-        row = rows[0]
-
-        # Estrutura esperada conforme SQL:
-        # 0: descricao
-        # 1: resposta_id
-        # 2: resposta_codigo
-        # 3: resposta_desc
-        # 4: campo_id
-        # 5: campo_codigo
-        # 6: campo_descricao
-        # 7: campo_multiresposta
-        # 8: campo_tipo
-        # 9: grupo_id
-        # 10: grupo_grupo
-        # 11: grupo_descricao
-        # 12: segmento
-
-        return {
-            "descricao": row[0] if len(row) > 0 else None,
-            "resposta": {
-                "id": row[1] if len(row) > 1 else None,
-                "codigo": row[2] if len(row) > 2 else None,
-                "descricao": row[3] if len(row) > 3 else None,
-            },
-            "campo": {
-                "id": row[4] if len(row) > 4 else None,
-                "codigo": row[5] if len(row) > 5 else None,
-                "descricao": row[6] if len(row) > 6 else None,
-                "multiresposta": row[7] if len(row) > 7 else None,
-                "tipo": row[8] if len(row) > 8 else None,
-            },
-            "grupo": {
-                "id": row[9] if len(row) > 9 else None,
-                "grupo": row[10] if len(row) > 10 else None,
-                "descricao": row[11] if len(row) > 11 else None,
-            }
-        }
-    except Exception as e:
-        print(f"Erro ao extrair BIC: {e}")
-        return None
 
 
 def extrair_todas_bics_edificacao(
