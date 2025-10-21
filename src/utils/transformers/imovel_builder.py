@@ -212,22 +212,28 @@ def _build_proprietarios(cadastro: int) -> Dict[str, Any]:
     pessoas = {}
 
     # Proprietário principal
-    prop_row = _get_first_row(
-        exec_select(SQL_PROPRIETARIO.format(cadastro=cadastro))
-    )
-    if prop_row:
-        proprietario = map_pessoa(prop_row)
-        if proprietario:
-            pessoas["proprietario"] = proprietario
+    try:
+        prop_row = _get_first_row(
+            exec_select(SQL_PROPRIETARIO.format(cadastro=cadastro), silent=True)
+        )
+        if prop_row:
+            proprietario = map_pessoa(prop_row)
+            if proprietario:
+                pessoas["proprietario"] = proprietario
+    except Exception:
+        pass  # Campo não existe no banco
 
     # Corresponsável
-    corresp_row = _get_first_row(
-        exec_select(SQL_CORRESPONSAVEL.format(cadastro=cadastro))
-    )
-    if corresp_row:
-        corresponsavel = map_pessoa(corresp_row)
-        if corresponsavel:
-            pessoas["corresponsavel"] = corresponsavel
+    try:
+        corresp_row = _get_first_row(
+            exec_select(SQL_CORRESPONSAVEL.format(cadastro=cadastro), silent=True)
+        )
+        if corresp_row:
+            corresponsavel = map_pessoa(corresp_row)
+            if corresponsavel:
+                pessoas["corresponsavel"] = corresponsavel
+    except Exception:
+        pass  # Campo não existe no banco
 
     return pessoas
 
@@ -242,18 +248,21 @@ def _build_testadas(cadastro: int) -> List[Dict[str, Any]]:
     Returns:
         Lista de testadas
     """
-    rows = exec_select(SQL_TESTADAS.format(cadastro=cadastro))
+    try:
+        rows = exec_select(SQL_TESTADAS.format(cadastro=cadastro), silent=True)
 
-    if not rows:
-        return []
+        if not rows:
+            return []
 
-    testadas = []
-    for row in rows:
-        testada = map_testada(row)
-        if testada:
-            testadas.append(testada)
+        testadas = []
+        for row in rows:
+            testada = map_testada(row)
+            if testada:
+                testadas.append(testada)
 
-    return testadas
+        return testadas
+    except Exception:
+        return []  # Campo não existe no banco
 
 
 def _build_estruturas_complementares(cadastro: int) -> Dict[str, Any]:
@@ -269,49 +278,64 @@ def _build_estruturas_complementares(cadastro: int) -> Dict[str, Any]:
     estruturas = {}
 
     # Loteamento
-    lote_row = _get_first_row(
-        exec_select(SQL_LOTEAMENTO.format(cadastro=cadastro))
-    )
-    if lote_row:
-        loteamento = map_loteamento(lote_row)
-        if loteamento:
-            estruturas["loteamento"] = loteamento
+    try:
+        lote_row = _get_first_row(
+            exec_select(SQL_LOTEAMENTO.format(cadastro=cadastro), silent=True)
+        )
+        if lote_row:
+            loteamento = map_loteamento(lote_row)
+            if loteamento:
+                estruturas["loteamento"] = loteamento
+    except Exception:
+        pass  # Campo não existe no banco
 
     # Condomínio
-    cond_row = _get_first_row(
-        exec_select(SQL_CONDOMINIO.format(cadastro=cadastro))
-    )
-    if cond_row:
-        condominio = map_condominio(cond_row)
-        if condominio:
-            estruturas["condominio"] = condominio
+    try:
+        cond_row = _get_first_row(
+            exec_select(SQL_CONDOMINIO.format(cadastro=cadastro), silent=True)
+        )
+        if cond_row:
+            condominio = map_condominio(cond_row)
+            if condominio:
+                estruturas["condominio"] = condominio
+    except Exception:
+        pass  # Campo não existe no banco
 
     # Agrupamento
-    agrup_row = _get_first_row(
-        exec_select(SQL_AGRUPAMENTO.format(cadastro=cadastro))
-    )
-    if agrup_row:
-        agrupamento = map_agrupamento(_get_field(agrup_row, 0))
-        if agrupamento:
-            estruturas["agrupamento"] = agrupamento
+    try:
+        agrup_row = _get_first_row(
+            exec_select(SQL_AGRUPAMENTO.format(cadastro=cadastro), silent=True)
+        )
+        if agrup_row:
+            agrupamento = map_agrupamento(_get_field(agrup_row, 0))
+            if agrupamento:
+                estruturas["agrupamento"] = agrupamento
+    except Exception:
+        pass  # Campo não existe no banco
 
     # Seção
-    secao_row = _get_first_row(
-        exec_select(SQL_SECAO.format(cadastro=cadastro))
-    )
-    if secao_row:
-        secao = map_secao(_get_field(secao_row, 0))
-        if secao:
-            estruturas["secao"] = secao
+    try:
+        secao_row = _get_first_row(
+            exec_select(SQL_SECAO.format(cadastro=cadastro), silent=True)
+        )
+        if secao_row:
+            secao = map_secao(_get_field(secao_row, 0))
+            if secao:
+                estruturas["secao"] = secao
+    except Exception:
+        pass  # Campo não existe no banco
 
     # Imobiliária
-    imob_row = _get_first_row(
-        exec_select(SQL_IMOBILIARIA.format(cadastro=cadastro))
-    )
-    if imob_row:
-        imobiliaria = map_pessoa(imob_row)
-        if imobiliaria:
-            estruturas["imobiliaria"] = imobiliaria
+    try:
+        imob_row = _get_first_row(
+            exec_select(SQL_IMOBILIARIA.format(cadastro=cadastro), silent=True)
+        )
+        if imob_row:
+            imobiliaria = map_pessoa(imob_row)
+            if imobiliaria:
+                estruturas["imobiliaria"] = imobiliaria
+    except Exception:
+        pass  # Campo não existe no banco
 
     return estruturas
 

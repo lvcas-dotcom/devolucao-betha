@@ -36,8 +36,17 @@ def get_pool():
     return _POOL
 
 
-def exec_select(sql):
-    """Executa um select e retorna os resultados."""
+def exec_select(sql, silent=False):
+    """
+    Executa um select e retorna os resultados.
+    
+    Args:
+        sql: Query SQL a ser executada
+        silent: Se True, suprime mensagens de erro (útil para queries opcionais)
+    
+    Returns:
+        Lista de tuplas com os resultados ou None em caso de erro
+    """
     
     conn = None
     cursor = None
@@ -60,14 +69,17 @@ def exec_select(sql):
         return resultados
     
     except psycopg2.Error as e:
-        print("Erro durante a execução da consulta:", e)
+        if not silent:
+            print("Erro durante a execução da consulta:", e)
         return None
     finally:
         # fecha o cursor
         if cursor:
             cursor.close()
-            print('cursor fechado com sucesso!')
+            if not silent:
+                print('cursor fechado com sucesso!')
         # fecha a conexao
         if conn:
             get_pool().putconn(conn)
-            print('conexao fechada com sucesso!')
+            if not silent:
+                print('conexao fechada com sucesso!')
