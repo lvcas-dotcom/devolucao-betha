@@ -2,9 +2,79 @@
 
 Sistema modular para geração de JSONs de imóveis compatíveis com a API da Betha Cloud, extraindo dados do banco GEON.
 
-Este script gera JSONs para múltiplos cadastros de uma vez,
+## ✨ Funcionalidades
 
-facilitando o processamento em massa.## 📋 Estrutura do Projeto
+### Opção 4 - Gerar JSON de IMÓVEL para devolução (Betha)
+
+Extrai dados completos do banco GEON e gera JSON compatível com a API Betha contendo:
+
+#### 📊 Dados Extraídos:
+
+**Informações Básicas:**
+
+- ID do Imóvel
+- Inscrição Imobiliária
+- Tipo (URBANO/RURAL)
+- Situação
+- Coordenadas geográficas (latitude/longitude)
+- Setor, quadra, lote, matrícula
+
+**Áreas:**
+
+- Área do lote
+- Área de cada edificação (por sequência)
+- Área total construída
+
+**BICs do Lote (6 campos):**
+
+- Meio Fio
+- Pavimentação
+- Ocupação
+- Utilização
+- Situação
+- Cerca/Muro
+
+**BICs da Edificação (13 campos):**
+
+- Tipo
+- Alinhamento
+- Localização
+- Posição
+- Estrutura
+- Cobertura
+- Vedação
+- Forro
+- Revestimento Externo
+- Sanitários
+- Acabamento Interno
+- Piso
+- Conservação
+
+#### 🎯 Exemplo de Uso:
+
+```bash
+python3 src/main.py
+# Escolha opção 4
+# Informe o cadastro (ex: 45)
+```
+
+**Saída:**
+
+```
+✅ JSON gerado com sucesso!
+📁 Arquivo: data/json/post_imoveis/45.json
+
+📊 Estatísticas:
+   • Cadastro: 45
+   • Inscrição: 0101001
+   • Tipo: URBANO
+   • Total de campos adicionais: 22
+   • Áreas: 3
+   • BICs do Lote: 6
+   • BICs da Edificação: 13
+```
+
+## 📋 Estrutura do Projeto
 
 """
 
@@ -144,19 +214,17 @@ if **name** == "**main**": - Tipo
 
 - Forro
 
+  # Ou ler de um arquivo: - Revestimento Externo
 
-    # Ou ler de um arquivo:   - Revestimento Externo
+  # with open("cadastros.txt") as f: - Sanitários
 
-    # with open("cadastros.txt") as f:   - Sanitários
-
-    #     CADASTROS = [int(line.strip()) for line in f if line.strip()]   - Acabamento Interno
+  # CADASTROS = [int(line.strip()) for line in f if line.strip()] - Acabamento Interno
 
 - Piso
 
+  # Gerar JSONs - Conservação
 
-    # Gerar JSONs   - Conservação
-
-    gerar_jsons_em_lote(CADASTROS)   - Utilização
+  gerar_jsons_em_lote(CADASTROS) - Utilização
 
 ## 🚀 Como Usar
 

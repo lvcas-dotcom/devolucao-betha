@@ -121,7 +121,7 @@ def _build_coordenadas(cadastro: int) -> Dict[str, Any]:
         Dicionário com latitude e longitude (se disponíveis)
     """
     row = _get_first_row(
-        exec_select(SQL_COORDENADAS.format(cadastro=cadastro))
+        exec_select(SQL_COORDENADAS.format(cadastro=cadastro), silent=True)
     )
 
     coords = {}
@@ -155,7 +155,7 @@ def _build_endereco(cadastro: int) -> Dict[str, Any]:
         Dicionário com dados de endereço
     """
     row = _get_first_row(
-        exec_select(SQL_ENDERECO_IMOVEL.format(cadastro=cadastro))
+        exec_select(SQL_ENDERECO_IMOVEL.format(cadastro=cadastro), silent=True)
     )
 
     if not row:
@@ -380,7 +380,7 @@ def _build_campos_adicionais(cadastro: int) -> List[Dict[str, Any]]:
           AND demolido IS NOT TRUE
         ORDER BY sequencia
         """
-        seq_rows = exec_select(query_edificacoes)
+        seq_rows = exec_select(query_edificacoes, silent=True)
 
         if seq_rows:
             for seq_row in seq_rows:

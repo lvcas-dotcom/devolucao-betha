@@ -30,7 +30,7 @@ def _extrair_bic_generica(
         query = sql_query + str(cadastro)
 
     try:
-        rows = exec_select(query)
+        rows = exec_select(query, silent=True)
         if not rows or len(rows) == 0:
             return None
 
@@ -96,23 +96,13 @@ def extrair_todas_bics_edificacao(
         modelocampo.campo AS campo_codigo,
         modelocampo.descricao AS campo_descricao,
         modelocamporesposta.idkey AS resposta_id,
-        modelocamporesposta.modeloresposta AS resposta_codigo,
-        modelocamporesposta.descricao AS resposta_desc,
-        CASE
-            WHEN t.idkey = 1 THEN 'P'
-            WHEN t.idkey = 2 THEN 'N'
-            WHEN t.idkey = 3 THEN 'T'
-            ELSE 'T'
-        END AS campo_tipo,
-        modelogrupo.descricao AS grupo_descricao
+        modelocamporesposta.resposta AS resposta_codigo,
+        modelocamporesposta.descricao AS resposta_descricao
     FROM
-        imobiliario.edificacao edif
-    LEFT JOIN
-        imobiliario.edificacaobic tpl_bic
-        ON tpl_bic.idkey_edificacao = edif.idkey
-    LEFT JOIN
+        geral.bic bic
+    JOIN
         geral.biccamporespostas camporesposta
-        ON tpl_bic.idkey_biccamporespostas = camporesposta.idkey
+        ON bic.idkey = camporesposta.idkey_bic
     JOIN
         geral.bicrespostaperiodos periodo
         ON camporesposta.idkey_bicrespostaperiodo = periodo.idkey
@@ -126,23 +116,16 @@ def extrair_todas_bics_edificacao(
     LEFT JOIN
         geral.bicmodelocampo modelocampo
         ON modelocamporesposta.idkey_bicmodelocampo = modelocampo.idkey
-    LEFT JOIN
-        geral.tipocampo t
-        ON t.idkey = modelocampo.tipocampo_idkey
-    LEFT JOIN
-        geral.bicmodelogrupo modelogrupo
-        ON modelocampo.idkey_bicmodelogrupo = modelogrupo.idkey
     WHERE
-        edif.cadastro = {cadastro}
-        AND edif.sequencia = {sequencia}
-        AND modelocampo.idkey IS NOT NULL
-        AND modelocamporesposta.descricao IS NOT NULL
+        bic.cadastro = {cadastro}
+        AND bic.sequencia = {sequencia}
+        AND bic.tabela_vinculo ILIKE '%edificacoes%'
     ORDER BY
         campo_id
     """
 
     try:
-        rows = exec_select(query)
+        rows = exec_select(query, silent=True)
         if not rows:
             return {}
 
@@ -298,7 +281,7 @@ def extrair_todas_bics_lote(cadastro: int) -> Dict[str, Any]:
     """
 
     try:
-        rows = exec_select(query)
+        rows = exec_select(query, silent=True)
         if not rows:
             return {}
 
