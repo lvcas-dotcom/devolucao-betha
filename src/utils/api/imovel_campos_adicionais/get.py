@@ -24,7 +24,7 @@ def get_imovel_campos_adicinais(cadastro):
 
     # api para receber dados
     url = (
-        'https://tributos.suite.betha.cloud/dados/v1/imoveis/'
+        'https://tributos.suite.betha.cloud/geoprocessamento/v1/imoveis/'
         + id_imovel
         + '/campos-adicionais'
     )
